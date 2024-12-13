@@ -1,0 +1,81 @@
+classdef FoodApp < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure        matlab.ui.Figure
+        InputArea       matlab.ui.control.EditField
+        DescriptionArea matlab.ui.control.TextArea
+        AppleButton     matlab.ui.control.Button
+        PizzaButton     matlab.ui.control.Button
+        SushiButton     matlab.ui.control.Button
+        Label           matlab.ui.control.Label
+    end
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Callback for Apple Button
+        function AppleButtonPushed(app, event)
+            app.DescriptionArea.Value = 'Apples are sweet and crunchy fruits, great for snacks and baking.';
+        end
+
+        % Callback for Pizza Button
+        function PizzaButtonPushed(app, event)
+            app.DescriptionArea.Value = 'Pizza is a savory dish with a base of dough, topped with tomato sauce, cheese, and various toppings.';
+        end
+
+        % Callback for Sushi Button
+        function SushiButtonPushed(app, event)
+            app.DescriptionArea.Value = 'Sushi is a Japanese dish made of vinegared rice, often with raw fish, seaweed, and other ingredients.';
+        end
+
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure
+            app.UIFigure = uifigure('Position', [100 100 400 300]);
+            app.UIFigure.Name = 'Food Description App';
+
+            % Create Input Area
+            app.InputArea = uieditfield(app.UIFigure, 'text', 'Position', [50 230 300 30]);
+            app.InputArea.Placeholder = 'Type something here...';
+
+            % Create Label
+            app.Label = uilabel(app.UIFigure, 'Position', [50 200 300 20]);
+            app.Label.Text = 'Click a button to get a description of the food:';
+
+            % Create Buttons
+            app.AppleButton = uibutton(app.UIFigure, 'push', 'Position', [50 150 100 30]);
+            app.AppleButton.Text = 'Apple';
+            app.AppleButton.ButtonPushedFcn = @(btn, event) AppleButtonPushed(app, event);
+
+            app.PizzaButton = uibutton(app.UIFigure, 'push', 'Position', [160 150 100 30]);
+            app.PizzaButton.Text = 'Pizza';
+            app.PizzaButton.ButtonPushedFcn = @(btn, event) PizzaButtonPushed(app, event);
+
+            app.SushiButton = uibutton(app.UIFigure, 'push', 'Position', [270 150 100 30]);
+            app.SushiButton.Text = 'Sushi';
+            app.SushiButton.ButtonPushedFcn = @(btn, event) SushiButtonPushed(app, event);
+
+            % Create Description Area
+            app.DescriptionArea = uitextarea(app.UIFigure, 'Position', [50 50 300 80]);
+            app.DescriptionArea.Editable = false;
+        end
+    end
+
+    % App initialization and construction
+    methods (Access = public)
+
+        % Construct app
+        function app = FoodApp
+            % Create and configure components
+            createComponents(app);
+        end
+
+    end
+end
