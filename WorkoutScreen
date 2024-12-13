@@ -1,0 +1,115 @@
+classdef app1 < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure     matlab.ui.Figure
+        Toolbar      matlab.ui.container.Toolbar
+        PushTool     matlab.ui.container.toolbar.PushTool
+        EditField_3  matlab.ui.control.EditField
+        Gauge        matlab.ui.control.Gauge
+        GaugeLabel   matlab.ui.control.Label
+        EditField_2  matlab.ui.control.EditField
+        Image        matlab.ui.control.Image
+        MenuButton   matlab.ui.control.Button
+        EditField    matlab.ui.control.EditField
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Color = [0 0 0];
+            app.UIFigure.Position = [100 100 640 870];
+            app.UIFigure.Name = 'MATLAB App';
+
+            % Create Toolbar
+            app.Toolbar = uitoolbar(app.UIFigure);
+
+            % Create PushTool
+            app.PushTool = uipushtool(app.Toolbar);
+
+            % Create EditField
+            app.EditField = uieditfield(app.UIFigure, 'text');
+            app.EditField.FontSize = 30;
+            app.EditField.FontWeight = 'bold';
+            app.EditField.FontColor = [1 1 1];
+            app.EditField.BackgroundColor = [0.851 0.3255 0.098];
+            app.EditField.Position = [130 628 379 66];
+            app.EditField.Value = '         💪 Arm Curls';
+
+            % Create MenuButton
+            app.MenuButton = uibutton(app.UIFigure, 'push');
+            app.MenuButton.BackgroundColor = [0 0.4471 0.7412];
+            app.MenuButton.FontSize = 24;
+            app.MenuButton.FontWeight = 'bold';
+            app.MenuButton.FontColor = [1 1 1];
+            app.MenuButton.Position = [30 777 128 37];
+            app.MenuButton.Text = 'Menu';
+
+            % Create Image
+            app.Image = uiimage(app.UIFigure);
+            app.Image.Position = [-79 196 772 402];
+            app.Image.ImageSource = 'shutterstock_419477203_480x480.jpg';
+
+            % Create EditField_2
+            app.EditField_2 = uieditfield(app.UIFigure, 'text');
+            app.EditField_2.FontSize = 36;
+            app.EditField_2.FontWeight = 'bold';
+            app.EditField_2.FontColor = [1 1 1];
+            app.EditField_2.BackgroundColor = [0 0.4471 0.7412];
+            app.EditField_2.Position = [159 65 316 49];
+            app.EditField_2.Value = '   Rep Goal: 25';
+
+            % Create GaugeLabel
+            app.GaugeLabel = uilabel(app.UIFigure);
+            app.GaugeLabel.HorizontalAlignment = 'center';
+            app.GaugeLabel.Position = [537 657 41 22];
+            app.GaugeLabel.Text = 'Gauge';
+
+            % Create Gauge
+            app.Gauge = uigauge(app.UIFigure, 'circular');
+            app.Gauge.Position = [497 694 120 120];
+
+            % Create EditField_3
+            app.EditField_3 = uieditfield(app.UIFigure, 'text');
+            app.EditField_3.FontSize = 18;
+            app.EditField_3.FontWeight = 'bold';
+            app.EditField_3.FontColor = [1 1 1];
+            app.EditField_3.BackgroundColor = [0.851 0.3255 0.098];
+            app.EditField_3.Position = [506 812 100 27];
+            app.EditField_3.Value = ' Time Left';
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = app1
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end
