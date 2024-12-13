@@ -1,0 +1,214 @@
+function createWelcomeApp()
+    % Create the main application figure
+    fig = uifigure('Name', 'LiftLab', 'Position', [100, 100, 400, 600]);
+
+    % Initialize appData structure
+    appData = struct();
+    appData.currentPage = 1;  % Start with the first page
+    appData.weight = 70;       % Default initial weight
+    appData.height = NaN;      % Default height as NaN
+    appData.gender = '';      % Default gender as empty
+    appData.name = '';        % Default name as empty
+
+    % Initialize page content
+    showPage(fig, appData, 1);
+end
+
+function goToNextPage(fig, appData)
+    % Logic to go to the next page
+    if appData.currentPage < 6  % Assume there are 5 pages in total
+        appData.currentPage = appData.currentPage + 1;
+        showPage(fig, appData, appData.currentPage);
+    else
+        uialert(fig, 'You have reached the last page!', 'Next Page');
+    end
+end
+
+function goToPreviousPage(fig, appData)
+    % Logic to go to the previous page
+    if appData.currentPage > 1
+        appData.currentPage = appData.currentPage - 1;
+        showPage(fig, appData, appData.currentPage);
+    else
+        uialert(fig, 'You are on the first page!', 'Previous Page');
+    end
+end
+
+function showPage(fig, appData, pageIndex)
+    % Logic to display a specific page content based on the page index
+    % First, remove all previous components (if needed)
+    children = fig.Children;
+    for i = 1:length(children)
+        delete(children(i));  % Delete all existing UI components
+    end
+
+    % Update the page content based on the pageIndex
+    switch pageIndex
+        case 1
+            % Page 1 content (Welcome Page)
+            welcomeLabel = uilabel(fig, 'Text', 'Welcome', 'FontSize', 50, ...
+                'FontWeight', 'bold', 'HorizontalAlignment', 'center', ...
+                'Position', [-50, 450, 500, 70]);
+
+            toLabel = uilabel(fig, 'Text', 'to', 'FontSize', 40, ...
+                'FontWeight', 'bold', 'HorizontalAlignment', 'center', ...
+                'Position', [150, 385, 100, 50]);
+
+            liftLabLabel = uilabel(fig, 'Text', 'Lift Lab', 'FontSize', 60, ...
+                'FontWeight', 'bold', 'HorizontalAlignment', 'center', ...
+                'Position', [-50, 310, 500, 70]);
+
+            uibutton(fig, 'Text', 'Next -->', 'Position', [300, 0, 100, 30], ...
+                'ButtonPushedFcn', @(btn, event) goToNextPage(fig, appData));
+        case 2
+            % Page 2 content (Gender selection page)
+            uilabel(fig, 'Text', 'Select Gender:', 'FontSize', 24, ...
+                'FontWeight', 'bold', 'HorizontalAlignment', 'center', ...
+                'Position', [50, 450, 300, 50]);
+
+            % Gender selection buttons
+            maleButton = uibutton(fig, 'Text', 'Male', 'Position', [50, 300, 100, 40], ...
+                'ButtonPushedFcn', @(btn, event) selectGender(fig, appData, 'Male'));
+            femaleButton = uibutton(fig, 'Text', 'Female', 'Position', [150, 300, 100, 40], ...
+                'ButtonPushedFcn', @(btn, event) selectGender(fig, appData, 'Female'));
+            otherButton = uibutton(fig, 'Text', 'Other', 'Position', [250, 300, 100, 40], ...
+                'ButtonPushedFcn', @(btn, event) selectGender(fig, appData, 'Other'));
+
+            % Next button
+            uibutton(fig, 'Text', 'Next -->', 'Position', [300, 0, 100, 30], ...
+                'ButtonPushedFcn', @(btn, event) goToNextPage(fig, appData));
+            % Previous button
+            uibutton(fig, 'Text', '<-- Previous', 'Position', [0, 0, 100, 30], ...
+                'ButtonPushedFcn', @(btn, event) goToPreviousPage(fig, appData));
+        case 3
+            % Page 3 content (Weight input page)
+            uilabel(fig, 'Text', 'Enter your Weight:', 'FontSize', 24, ...
+                'FontWeight', 'bold', 'HorizontalAlignment', 'center', ...
+                'Position', [50, 450, 300, 50]);
+
+            % Create the weight input buttons (scrolling dial effect)
+            createWeightDial(fig, appData);
+
+            % Next button
+            uibutton(fig, 'Text', 'Next -->', 'Position', [300, 0, 100, 30], ...
+                'ButtonPushedFcn', @(btn, event) goToNextPage(fig, appData));
+            % Previous button
+            uibutton(fig, 'Text', '<-- Previous', 'Position', [0, 0, 100, 30], ...
+                'ButtonPushedFcn', @(btn, event) goToPreviousPage(fig, appData));
+        case 4
+            % Page 4 content (Height input page)
+            uilabel(fig, 'Text', 'Enter your Height (cm):', 'FontSize', 24, ...
+                'FontWeight', 'bold', 'HorizontalAlignment', 'center', ...
+                'Position', [50, 450, 300, 50]);
+
+            % Height input box
+            heightInput = uieditfield(fig, 'numeric', 'Position', [150, 300, 100, 40]);
+
+            % Next button
+            uibutton(fig, 'Text', 'Next -->', 'Position', [300, 0, 100, 30], ...
+                'ButtonPushedFcn', @(btn, event) goToNextPage(fig, appData));
+            % Previous button
+            uibutton(fig, 'Text', '<-- Previous', 'Position', [0, 0, 100, 30], ...
+                'ButtonPushedFcn', @(btn, event) goToPreviousPage(fig, appData));
+
+        case 5
+            % Page 5 content (Name input page)
+            uilabel(fig, 'Text', 'Enter your Name:', 'FontSize', 24, ...
+                'FontWeight', 'bold', 'HorizontalAlignment', 'center', ...
+                'Position', [50, 450, 300, 50]);
+
+            % Name input box
+            nameInput = uieditfield(fig, 'text', 'Position', [150, 300, 100, 40]);
+
+            % Save the name when user finishes typing (optional action)
+            uibutton(fig, 'Text', 'Next -->', 'Position', [300, 0, 100, 30], ...
+                'ButtonPushedFcn', @(btn, event) saveName(fig, appData, nameInput));
+            % Previous button
+            uibutton(fig, 'Text', '<-- Previous', 'Position', [0, 0, 100, 30], ...
+                'ButtonPushedFcn', @(btn, event) goToPreviousPage(fig, appData));
+        case 6
+   % Page 6 content (Personalized welcome page)
+    uilabel(fig, 'Text', 'Welcome!', 'FontSize', 40, ...
+        'FontWeight', 'bold', 'HorizontalAlignment', 'center', ...
+        'Position', [50, 450, 300, 50]);
+    
+    % Display name from appData
+    name = appData.name;
+    uilabel(fig, 'Text', [name, '!'], 'FontSize', 40, ...
+        'FontWeight', 'bold', 'HorizontalAlignment', 'center', ...
+        'Position', [50, 400, 300, 50]);
+
+    % Adjusted position for the overview text
+    overviewText = 'This is a brief overview of your profile. You can review or update the details at any time.';
+    uilabel(fig, 'Text', overviewText, 'FontSize', 14, 'FontWeight', 'normal', ...
+        'HorizontalAlignment', 'center', 'Position', [50, 100, 300, 50], 'WordWrap', 'on');
+    % Finish button
+            uibutton(fig, 'Text', 'Finish', 'Position', [300, 0, 100, 30], ...
+                'ButtonPushedFcn', @(btn, event) finishApp(fig));
+    % Previous button
+    uibutton(fig, 'Text', '<-- Previous', 'Position', [0, 0, 100, 30], ...
+        'ButtonPushedFcn', @(btn, event) goToPreviousPage(fig, appData));
+    end
+end
+
+
+function saveName(fig, appData, nameInput)
+    % Save the entered name to appData
+    appData.name = nameInput.Value;
+    disp(['Entered Name: ', appData.name]);
+    goToNextPage(fig, appData);  % Go to the next page after saving the name
+end
+
+function selectGender(fig, appData, gender)
+    % Store the selected gender in appData
+    appData.gender = gender;
+    disp(['Selected Gender: ', gender]);
+
+    % Update the page with the new data
+    showPage(fig, appData, appData.currentPage);  % Redraw the current page with updated data
+end
+
+
+function createWeightDial(fig, appData)
+    % Create a label to display the selected weight
+    appData.weightLabel = uilabel(fig, 'Text', ['Weight: ', num2str(appData.weight), ' kg'], ...
+        'Position', [150, 300, 100, 40], 'FontSize', 16, 'FontWeight', 'bold');
+
+    % Create "Up" button to increase weight
+    uibutton(fig, 'Text', '↑', 'Position', [180, 350, 40, 30], ...
+        'ButtonPushedFcn', @(btn, event) adjustWeight(fig, appData, 1));
+
+    % Create "Down" button to decrease weight
+    uibutton(fig, 'Text', '↓', 'Position', [180, 250, 40, 30], ...
+        'ButtonPushedFcn', @(btn, event) adjustWeight(fig, appData, -1));
+end
+
+function adjustWeight(fig, appData, increment)
+    % Adjust the weight based on the button press
+    appData.weight = appData.weight + increment;
+
+    % Ensure weight is within reasonable bounds (e.g., between 30 kg and 200 kg)
+    if appData.weight < 30
+        appData.weight = 30;
+    elseif appData.weight > 200
+        appData.weight = 200;
+    end
+
+    % Update the weight label to display the current weight
+    appData.weightLabel.Text = ['Weight: ', num2str(appData.weight), ' kg'];
+
+    % Make sure to update the appData (pass back to the main function)
+    showPage(fig, appData, appData.currentPage);  % Redraw the current page with updated data
+end
+
+function finishApp(fig)
+    % Close the application or finalize
+    close(fig);
+end
+
+function saveHeight(fig, appData, heightInput)
+    % Save the entered height to appData
+    appData.height = heightInput.Value;
+    disp(['Entered Height: ', num2str(appData.height), ' cm']);
+    goToNextPage(fig, appData);  % Go to the next page after saving the height
+end
