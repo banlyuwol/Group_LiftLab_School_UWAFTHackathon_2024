@@ -1,0 +1,178 @@
+classdef WorkoutPage < handle
+    properties
+        UIFigure          % Main App Window
+        WorkoutTitle      % Label for the Workout Name
+        RepGoalLabel      % Label for Rep Goal
+        TimerLabel        % Label for Countdown Timer
+        MenuButton        % Menu Button
+        InstructionImage  % Image for Workout Technique
+        CountdownTimer    % Timer Object for Countdown
+        CountdownValue    % Countdown Value
+        InputPrompt       % Label for Input Prompt
+        InputField        % Text Field for User Input
+        SubmitButton      % Button to Submit Reps
+        RepCountLabel     % Label to Display Rep Count
+    end
+    
+    methods
+        % Constructor to build the UI
+        function app = WorkoutPage()
+            % Create the main window with a black background
+            app.UIFigure = uifigure('Name', 'Beginner Workout', 'Position', [100, 100, 400, 600]);
+            app.UIFigure.Color = 'black';
+            
+            % Add Menu Button (Top-Left Corner)
+            app.MenuButton = uibutton(app.UIFigure, 'Text', '☰ Menu', ...
+                'Position', [10, 550, 80, 30], 'BackgroundColor', '#007BFF', ...
+                'FontSize', 16, 'FontWeight', 'bold', 'FontColor', 'white', ...
+                'ButtonPushedFcn', @(~, ~) app.openMenu());
+            
+            % Add Workout Title at the top
+            app.WorkoutTitle = uilabel(app.UIFigure, 'Text', '💪 Arm Curls', ...
+                'FontSize', 26, 'FontWeight', 'bold', 'FontName', 'Verdana', ...
+                'HorizontalAlignment', 'center', ...
+                'Position', [50, 500, 300, 40], 'BackgroundColor', '#FF7043', 'FontColor', 'white');
+            
+            % Add Rep Goal Label at the Bottom
+            app.RepGoalLabel = uilabel(app.UIFigure, 'Text', 'In 30 seconds, we should do 25 reps', ...
+                'FontSize', 14, 'FontWeight', 'bold', 'FontName', 'Verdana', ...
+                'HorizontalAlignment', 'center', ...
+                'Position', [50, 30, 300, 30], 'FontColor', '#FFFFFF');
+            
+            % Add Countdown Timer Label
+            app.TimerLabel = uilabel(app.UIFigure, 'Text', '30', ...
+                'FontSize', 48, 'FontWeight', 'bold', 'FontName', 'Verdana', ...
+                'HorizontalAlignment', 'center', ...
+                'Position', [150, 380, 100, 60], 'FontColor', '#00FF00');
+
+            
+            
+            % Download the image to a temporary file
+            imageURL = 'https://www.dmoose.com/cdn/shop/articles/1_27c2b3f6-0d18-4cb0-adf1-935e612684fa.jpg?v=1658851752';
+            tempImagePath = fullfile(tempdir, 'workout_image.jpg');
+            websave(tempImagePath, imageURL);
+            
+            % Add Image in the middle for workout technique
+            app.InstructionImage = uiimage(app.UIFigure, ...
+                'ImageSource', tempImagePath, ...
+                'Position', [50, 150, 300, 200]);
+            
+            % Start the 30-second countdown timer
+            app.startCountdown();
+        end
+        
+        % Callback: Open Menu
+        function openMenu(app)
+            uialert(app.UIFigure, 'Menu is currently under construction.', 'Menu');
+        end
+        
+        % Function to Start the Countdown Timer
+        function startCountdown(app)
+            app.CountdownValue = 30;  % Set countdown start value
+            
+            % Create and configure the timer object
+            app.CountdownTimer = timer(...
+                'ExecutionMode', 'fixedRate', ...
+                'Period', 1, ...
+                'TimerFcn', @(~, ~) app.updateTimer(), ...
+                'StopFcn', @(~, ~) app.promptUserInput());
+            
+            start(app.CountdownTimer);
+        end
+        
+        % Function to Update Timer Label
+        function updateTimer(app)
+            app.CountdownValue = app.CountdownValue - 1;
+            app.TimerLabel.Text = num2str(app.CountdownValue);
+            
+            % Change color based on time remaining
+            if app.CountdownValue <= 10
+                app.TimerLabel.FontColor = '#D32F2F';  % Red color
+            elseif app.CountdownValue <= 20
+                app.TimerLabel.FontColor = '#FFA500';  % Yellow color
+            else
+                app.TimerLabel.FontColor = '#00FF00';  % Green color
+            end
+            
+            % Heartbeat effect
+            if mod(app.CountdownValue, 2) == 0
+                app.TimerLabel.FontSize = 52;
+            else
+                app.TimerLabel.FontSize = 48;
+            end
+            
+            % Stop timer when it reaches zero
+            if app.CountdownValue <= 0
+                stop(app.CountdownTimer);
+            end
+        end
+        
+        % Prompt User for Number of Reps
+        function promptUserInput(app)
+            % Clear existing UI elements
+            delete(app.InstructionImage);
+            delete(app.TimerLabel);
+            delete(app.RepGoalLabel);
+            
+            % Add input prompt
+            app.InputPrompt = uilabel(app.UIFigure, 'Text', 'How many reps did you complete?', ...
+                'FontSize', 18, 'FontWeight', 'bold', 'FontColor', '#FFFFFF', ...
+                'HorizontalAlignment', 'center', 'Position', [50, 350, 300, 30]);
+            
+            % Add input field (starts empty)
+            app.InputField = uieditfield(app.UIFigure, 'numeric', ...
+                'Position', [100, 300, 200, 40], 'FontSize', 16, 'Placeholder', '');
+            
+            % Add submit button
+            app.SubmitButton = uibutton(app.UIFigure, 'Text', 'Submit', ...
+                'Position', [150, 240, 100, 40], 'BackgroundColor', '#007BFF', ...
+                'FontSize', 16, 'FontWeight', 'bold', 'FontColor', 'white', ...
+                'ButtonPushedFcn', @(~, ~) app.checkReps());
+        end
+        
+        % Check if User Met the Goal
+        function checkReps(app)
+            reps = app.InputField.Value;
+            delete(app.InputPrompt);
+            delete(app.InputField);
+            delete(app.SubmitButton);
+            
+            % Display the rep count
+            app.RepCountLabel = uilabel(app.UIFigure, 'Text', sprintf('Rep Count: %d', reps), ...
+                'FontSize', 24, 'FontWeight', 'bold', 'FontColor', '#FF7043', ...
+                'HorizontalAlignment', 'center', 'Position', [50, 350, 300, 50]);
+            
+             if reps >= 25
+        app.displayCongratulations();
+    else
+        app.displayMotivation();
+    end
+end
+
+% Function to Display Congratulations with Confetti
+function displayCongratulations(app)
+    % Display Congratulations Message
+    uilabel(app.UIFigure, 'Text', '🎉 Congratulations! 🎉', ...
+        'FontSize', 24, 'FontWeight', 'bold', 'FontColor', '#00FF00', ...
+        'HorizontalAlignment', 'center', 'Position', [50, 300, 300, 50]);
+    
+    % Create a confetti effect
+    for i = 1:200
+        x = randi([10, 390]);
+        y = randi([300, 550]);
+        confetti = uilabel(app.UIFigure, 'Text', '🎊', ...
+            'FontSize', randi([12, 18]), 'Position', [x, y, 20, 20]);
+        pause(0.01);
+        delete(confetti);
+    end
+        end
+        
+        % Function to Display Motivational Quote
+function displayMotivation(app)
+    uilabel(app.UIFigure, 'Text', '“Don’t limit your challenges. Challenge your limits.”', ...
+        'FontSize', 16, 'FontWeight', 'bold', 'FontColor', '#FF7043', ...
+        'HorizontalAlignment', 'center', 'WordWrap', 'on', ...
+        'Position', [50, 250, 300, 100]);
+        end
+    end
+end
